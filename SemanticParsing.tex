@@ -1,0 +1,132 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Semantic Parsing}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Logical Forms
+	\begin{itemize}
+	\item Meaning in Linguistic
+	\item Language in logical forms
+	\end{itemize}
+	
+	\item Lambda Calculus
+	\begin{itemize}
+	\item Compositionality
+	\item Components
+	\item Combinators
+	\end{itemize}
+	
+	\item CCG
+	\begin{itemize}
+	\item Motivation
+	\item Linear Indexed Grammars
+	\item Formal definition
+	\end{itemize}
+	
+	\item Parsing Algorithms
+	\begin{itemize}
+	\item CKY style Algorithm
+	\item Polynomial time algorithm
+	\item Parsing in action
+	\end{itemize}
+	
+	\end{itemize}
+\end{comment}
+\textbf{Syntax vs. Semantic:} Structural organisation vs. underlying meaning of text.\\
+\begin{comment}
+	For example is a parse tree a representation of the structure of the text, but it is not saying a lot about the meaning of the text.\\
+	Semantics are needed when we want to actually do something with language.
+	Recognising speech is done by determining the words that were said, but wanting to derive the meaning needs parsing the words into commands, e.g. understand the instructions.\\
+	\textbf{Logical form:} Representation of meaning of a sentence, formed out of quantifiers, variables, boolean expressions and predicates. 
+	Each expression maps to a single meaning.\\
+	\textbf{Principle of compositionality:} We try to build models over the constituents of a sentence, instead of doing it for each sentence of the human language.\\
+	If we have a parse tree with heads, we can compose the semantics over the constituents.
+	The meaning of $x \rightarrow yz$ is a function of $y.sem$ and $z.sem$\\
+\end{comment} 
+
+\subsection{Lambda calculus}
+\textbf{$\beta$-Infinity:} $F = \lambda x((xx)x)$, FF = ((FF)F) = ...\\
+\textbf{Abstraction:} M is a term, x is a variable, $\lambda x. M$ is a term.\\
+\textbf{Application:} M and N are terms, $MN$ is a term.\\
+\begin{comment}
+	\textbf{$\alpha$-renaming} switches out variable names, such that in a reduction the variables don't change their free/bound occupation.\\
+	\textbf{$\beta$-reduction} applies an argument to a lambda term, f.e. $\lambda x. M N = M[x:=N]$.\\
+	$\beta$-reductions can be infinite: $F = \lambda x((xx)x)$, FF = ((FF)F) = ...\\
+	\textbf{Equivalence:} If one term can be obtained from the other in a finite amount of alpha and beta conversions. This problem is undecidable.\\
+	\textbf{Logical constants:} Objects and relations (with arity) between real Objects.\\
+\end{comment} 
+
+\textbf{Composition:} $S_{VP} \rightarrow NP \text{ } VP$, S.sem = VP.sem(NP.sem)
+
+\subsection{Combinatory Logic}
+I (I x = x), K (K x y = ((K x) y), S (S x y z = (x z)(y z)).
+\begin{comment}
+	Terms constructed by application of variables and combinators.\\
+	One can say that I and (S K K) x are extensively equivalent: (S K K) x = (S K K x) = (K x)(K x) = (K x) x = x = I, we don't need I.\\
+\end{comment} 
+
+\textbf{Equivalence:} lambda calculus and S-K calculus can be interchanged by T.\\
+\begin{comment}
+	T can be seen as transformator.\\
+\end{comment}
+
+
+%%%%%% Not exam relevant %%%%%%
+\endinput
+
+
+\subsection{Combinatory Categorical Grammars}
+\begin{comment}
+	Why combinatory categorical grammars?\\
+	\textbf{Coordination:} I like play bridge and Sara Handball; can not be modelled by CFG.\\
+	\textbf{Cross-serial dependencies}, like in dutch language, are not context-free.\\
+\end{comment}
+
+\textbf{Linear Indexed Languages:} $G = \langle \mathcal{N}, \mathcal{S}, \mathcal{I}, \Sigma, \mathcal{R} \rangle$, $N[\sigma] \rightarrow \alpha M[f\sigma] \beta$, are rules, $f \in \mathcal{I}$, $\alpha,\beta \in \Sigma$ \\
+\begin{comment}
+	It is possible to generate strings like $a^nb^nc^n$ with this grammar.\\
+	With each application of a rule, indices can be put on the stack. Most of the time, the rules build a stack and then reduce it. In the reduction phase, the indices can be used differentiate the different cases that put elements of the alphabet between $\alpha, \beta$.\\
+\end{comment}  
+
+\textbf{Slash:} $B \text{ } A\backslash B \rightarrow A$, $A/B \text{ } B \rightarrow A$, $B:a \text{ } A\backslash B:f \rightarrow A:f(a)$\\ 
+\begin{comment}
+	A CCG has two main parts: a lexicon that associates words with categories (set of word-category pairs) and rules that specify how categories can be combined into other categories.\\
+	The information about the structure is encoded in categories, unlike in CFG, where structure is encoded in the rules.\\
+	Basic categories are f.e. S, N, NP, PP, and the entries in the lexicon are something like (man, N).\\
+\end{comment} 
+
+\textbf{CCG:} $G = \langle V_T, V_N, S, f, R \rangle$\\
+\begin{comment}
+	Terminals (lexicon), Non-terminals (atomic categories), Start category, mapping from $V_T \rightarrow V_N$, and combinatory rules	.
+	A category of an incomplete constitution is a function that defines it's argument and result, and indicates with the slash where the argument applies.
+	A complete category is an atomic category, an incomplete category is a function that does the above.\\
+	Every category X can be written as $A |_m X_m ...|_1 X_1$, where A is the target and $|_m X_m$ are arguments of X. m is the arity of X.\\
+	Unlike CFG, CCG uses a universal set of rules, but encodes all language-specific information into the lexicon.\\
+\end{comment} 
+
+\textbf{Application:} $X/Y \text{ } Y \rightarrow X$, $Y \text{ } X \backslash Y \rightarrow X$\\
+\begin{comment}
+	A language with only the application rule could produce a context free AB-Grammar.\\
+\end{comment} 
+
+\textbf{Composition:} $X / Y \text{ } Y / Z \rightarrow X / Z$, $Y \backslash Z \text{ } X \backslash Y \rightarrow X \backslash Z$\\
+\todo{Don't understand type raising}\\
+
+\begin{comment}
+	CCG captures syntactic (Rules) and semantic (lambda calculus) jointly. 
+	We can easily translate the rules to logical forms, that can grasp the semantics of the sentence, whereas the syntax is encoded in the structure.\\
+\end{comment} 
+
+\subsection{Parsing CCG}
+\begin{comment}
+	The parsing can be seen as deductive process, the parsing algorithm can be seen as deduction system.
+	A grammatical deduction system is defined by a set of rules of inference and a set of axioms.\\
+\end{comment} 
+
+\textbf{Poly-time:} Restric arity to be $< c_G$ by splitting larger arities\\

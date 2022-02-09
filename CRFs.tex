@@ -1,0 +1,117 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Part-of-Speech tagging with CRF's}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Part-of-Speech Tagging
+	\begin{itemize}
+	\item Task Definition
+	\item Tag Sequences as Graph Paths
+	\end{itemize}
+	
+	\item Conditional Random Fields
+	\begin{itemize}
+	\item Formal Equation
+	\item Scoring Function
+	\item Efficient Global Normalization
+	\end{itemize}
+	
+	\item Semirings
+	\begin{itemize}
+	\item Definition
+	\item In Action
+	\end{itemize}
+	
+	\item Reframing CRFs
+	\begin{itemize}
+	\item Softmax Interpretation
+	\item The Structured Perceptron
+	\end{itemize}
+	\end{itemize}
+\end{comment}
+
+\textbf{As graph:} Fully connected graph with POS-tags nodes
+\begin{comment}
+	POS-Tags are noun, verb, adj, etc, assume m tags.
+	For a sentence of size n, we create a graph with n fully connected layers of m tags. When we score the edges, we can reformulate the problem to finding the best path through this graph, e.g. finding the most probable sequence of tags for this sentence.
+\end{comment}
+
+
+\textbf{Goodness:} $score(<D,N,V,..>, w) = \theta f(t,w) = NN_\theta(t,w)$.\\
+\begin{comment}
+	The score function calculates goodness of fit, this is mostly learned by backpropagation.
+	The problem comes from the number of paths. 
+	Scoring one path is alright, but the normalizer contains $m^n$ paths.\\
+\end{comment} 
+
+\subsection{Conditional Random Fields}
+$p(t|w) = \frac{\exp(score(t,w))}{\sum_{t' \in \cT^N} \exp(score(t',w))}$, $O(|\cT|^N)$ many paths\\
+
+\textbf{Decomposition:} $score(t,w) = \sum_{n=1}^N score(\langle t_{n-1}, t_n \rangle, w, n)$\\
+\begin{comment}
+	Using a score function that is additively decomposable helps with leveraging the structural independence assumption. 
+	In this example, we score only bigrams and compute the sum to score a full path.\\
+\end{comment} 
+
+$p(t, |w) \propto \exp(score(t,w)) = \prod_{n=1}^N \exp\{ score(\langle t_{n-1}, t_n \rangle, w) \}$\\
+\begin{comment}
+	The intermediate step is $\exp \sum_{n=1}^N score(\langle t_{n-1}, t_n \rangle, w. n)$.
+	This is important as we are generally concerned with probability models, using the additive decomposability and the softmax can be interpreted as probabilities along this path.\\
+	We are scoring each arc independently now.\\
+\end{comment} 
+
+$\sum_{\cT^{N-1}} \prod^{N-1} \exp (score(\langle t_{n-1}, n \rangle, w))\sum_{\cT} \exp (score(\langle t_{N-1}, t_N \rangle))$
+\begin{comment}
+	We have this huge sum over N long sequences in the beginning.
+	First step is to calculate the score by multiplying the exponentiated score functions of the bigrams.
+	We then divide the sum between the last bigram and the rest.
+	The former sum can be pushed (?) through the multiplication.\\
+\end{comment} 
+
+\textbf{Dynamic:} $\forall t_n \in \cT: \beta(w, t_N, N) \leftarrow 1;$ \\
+for $n \leftarrow N-1, .., 0$:\\
+$\forall t_n \in \cT$:\\
+$\beta(w, t_n, n) \leftarrow \sum_{t_{n+1} \in \cT} \exp (score(\langle t_{n}, t_{n+1} \rangle)) \times \beta(w, t_{n+1})$\\
+\begin{comment}
+	For each node in layer n, we sum up all paths through the nodes in layer n+1.
+	By storing the intermediate $\beta$ values, we do this implicitely.\\
+\end{comment} 
+
+
+\textbf{Viterbi:} $\beta(w, t_n) \leftarrow \max\limits_{t_{n+1} \in \cT} \exp (score(\langle t_{n}, t_{n+1} \rangle)) \times \beta(w, t_{n+1})$\\
+\begin{comment}
+The Viterbi algorithm can be used for the decoding problem of $t^* \leftarrow \arg\max_{t' \in \cT^N} score(t', w)$.\\
+Since times distributes over max as well, we can use the same algorithm as bevor, but use the max, instead of sum, to compute the $\beta$-values.\\
+\end{comment} 
+
+\textbf{Structured CRF:} log $p(t|w) = \Sigma_i(score(t^{(i)}, w^{(i)}) - \max_{t' \in \cT^N} score(t', w^{(i)}))$
+
+\subsection{Semiring}
+$\oplus, \bar{0}$: cum. Monoid, $\otimes, \bar{1}$: Monoid, $\otimes$ dist.over $\oplus$, $\bar{0}\otimes a = \bar{0}$\\
+\textbf{Boolean:} $\langle \{ 0,1 \}, or, and, 0, 1 \rangle$, logical dediction\\
+\textbf{Viterbi:} $\langle [ 0,1 ], max, \times, 0, 1 \rangle$, prob. of best derivation\\
+\textbf{Inside:} $\langle \mathbb{R}^+ \cup \{ \infty \}, +, \times, 0, 1 \rangle$, prob. of a string\\
+\textbf{Real:} $\langle \mathbb{R} \cup \{ \infty \}, min, +, \infty, 0 \rangle$, shortest distance\\
+\textbf{Tropical:} $\langle \mathbb{R}^+ \cup \{ \infty \}, min, +, \infty, 0 \rangle$,  with non-negative weights\\
+\textbf{Counting:} $\langle \mathbb{N}, +, \times, 0, 1 \rangle$, number of paths\\
+\begin{comment}
+	$\oplus, \bar{0}$: cum. Monoid: Monoid and a $\oplus$ b = b $\oplus$ a \\
+	$\otimes, \bar{1}$: Monoid: (a $\otimes$ b) $\otimes$ c = a $\otimes$ (b $\otimes$ c), $\bar{1} \otimes a = a$\\
+	$\otimes$ dist.over $\oplus$: $(a \oplus b) \otimes c = (a \otimes c) \oplus (b \otimes c)$, also w/ c in front. \\
+	$\bar{0}\otimes a = \bar{0}$: The identity element of plus must annihilate in the times relation\\
+\end{comment} 
+
+\textbf{Semi:} $\beta(w, t_n) \leftarrow \oplus_{t_{n+1} \in \cT} \exp (score(\langle t_{n}, t_{n+1} \rangle)) \otimes \beta(w, t_{n+1})$\\
+\begin{comment}
+	All shortest path algorithms with this dynamic program structure (using a semiring) are correct, since we proofed it for all semi-rings.\\
+\end{comment} 
+
+
+
+

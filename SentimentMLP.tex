@@ -1,0 +1,99 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Sentiment Analysis w/Multilayer Perceptron}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	\item Multi-layer Perceptrons
+	\begin{itemize}
+	\item Log-Linear Model Binary Classification
+	\item Linear Separability
+	\item Non-Linear Feature Functions
+	\item MLPs
+	\item XOR Problem
+	\end{itemize}
+	
+	\item Feature Engineering and Word Embeddings
+	\begin{itemize}
+	\item Encoding Word
+	\item Pooling and n-grams
+	\item Word Embeddings
+	\item Unsupervised Word Repr
+	\item Skip-Gram
+	\item BERT
+	\end{itemize}
+	
+	\item Sentiment Analysis
+	\begin{itemize}
+	\item What is it?
+	\item Why is it difficult?
+	\item How to build it?
+	\end{itemize}
+	
+	\end{itemize}
+\end{comment}
+
+\textbf{Sigmoid(x)} $= \frac{\exp(x)}{1 + \exp(x)} = \frac{1}{1 + \exp(-x)}$,$\nabla = \sigma(x)(1 - \sigma(x))$\\
+$softmax(y_0) = \sigma(\theta \cdot (f(x,y_0) - f(x,y_1))) = \sigma(\theta \cdot g(x))$\\
+\begin{comment}
+	The Sigmoid is a special case of the softmax for binary classification.
+	Can be derived from the softmax function.\\
+\end{comment} 
+
+\textbf{ReLu} $=max(x,0)$, \textbf{tanh(x)} $=\frac{1-e^{-2x}}{1+e^{-2x}}, \nabla = 1-tanh^2(x)$\\
+\begin{comment}
+	Sigmoid and tanh have the vanishing gradient problem. If values are really large are really small, the value of the gradient approaches 0. 
+	This then propagates through the NN, since all the gradients are dependent on each other.\\
+\end{comment} 
+
+\begin{comment}
+	Key idea of a Neural Network is, that it can learn the feature function jointly with the parameters.
+	If we define special g(.) to learn non-linear shapes with the log-linear model, we need to know the shape a-priori.\\
+\end{comment} 
+
+\textbf{MLP:} $h^{(N)} = \sigma^{(N)}(W^{(N)}\sigma^{(N-1)}(...\sigma^{(1)}(W^{(1)}e(x))))$\\
+\begin{comment}
+	Stacking of linear models combined with non-linearities. We need the non-linearities to gain predictive power over non-linear decision boundaries.\\
+\end{comment} 
+
+\textbf{One-hot:} vector $\in O(|V|)$, only given word is 1\\
+\textbf{Bag-of-words:} pooled one-hot vectors, via sum/mean/max\\
+\begin{comment}
+	The process of creating a bag-of-words is called pooling. Can pool by summing up, taking the mean or taking the max everywhere.\\
+	n-grams can be encoded this way, but the vectors get huge, since every combination needs a slot.\\
+\end{comment} 
+
+\subsection{Skip-gram/Embedding}
+\begin{comment}
+	We assume to have a large sentencised and tokenized corpus.
+	From there, we create word-context pairs using a window. This process takes linear time.\\
+\end{comment} 
+\textbf{Preprocessing:} Create word-context pairs ($k\times C$ many), sliding window k, Corpus C\\
+\begin{comment}
+	k=Window size, C=Corpus size\\
+	We slide over the corpus and create the pairs of words within the given window.\\
+\end{comment} 
+
+\textbf{Bilinear-Model:} Linear if all-but-one vars held constant\\
+
+\textbf{Model:} $p(c|w) = \frac{1}{Z(w)} \exp(e_{wrd}(w) \cdot e_{ctx}(c))$, $O(2|V|k)$ params\\
+\todo{Where do the params come from?}\\
+\begin{comment}
+	Every word can show up in the context and as word\\
+\end{comment} 
+
+$\sum^N \log p(c^{(n)} | w^{(n)}) = \sum^N (e_{wrd}(w^{(n)}) \cdot e_{ctx}(c^{(n)}) - \log Z(w^{(n)}))$\\
+
+\textbf{Similarity:} $cos(u_i, u_j)$, similarity of vectors
+
+
+\subsection{Sentiment Analysis}
+See Language Model "Learning"
+
+
+
+

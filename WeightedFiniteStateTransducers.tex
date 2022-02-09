@@ -1,0 +1,93 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Weighted Finite State Transducers}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item WFSTs
+	\begin{itemize}
+	\item Big Picture
+	\item Projectivity
+	\item Decombosable Score Function
+	\end{itemize}
+	
+	\item Floyd Warshal
+	\begin{itemize}
+	\item Floyd Warshal Recap
+	\item Matrix Multiplication
+	\item Semirings
+	\item FW as MM
+	\end{itemize}
+	
+	\item Finding Normalization Constant
+	\begin{itemize}
+	\item Computing infinite Sums
+	\item Warshal-Floyd-Kleene
+	\item Back to WFSTs
+	\end{itemize}	
+	\end{itemize}
+\end{comment}
+
+\begin{comment}
+	\textbf{Weighted finite state transducer}: 
+	Transducer maps sequences to another. They are used in Speech recognition, machine translation or transliteration (Map strings in one character set to another set).\\
+	The transducers are finite state because we have a finite set of states, e.g. the non-terminals and terminals.
+	They are weighted Weighted because we weight the probability of the transitions between the states.\\
+\end{comment} 
+
+\textbf{Finite state Transducer:} $T = \langle \mathcal{Q}, \Sigma, \Omega, \lambda, \rho, \delta \rangle$\\
+\begin{comment}
+	Finite set of states, input vocabulary, output vocabulary, function mapping state to initial scores, function mapping state to final scores, transition function mapping transitions to scores.\\
+	There are usually a large number of accepting paths to form y from x, the mapping is therefore ambigous. We focus on the unambiguous case.\\
+\end{comment} 
+
+\textbf{Goal:} $p(y|x), x\in \Sigma^*, y\in \Omega^*$\\
+\textbf{Score:} $score(\pi) = \lambda(q_{start}) + \delta(q_{start} | q_1) + ... + \rho(q_{end}) = \sum_n^{|\pi|} w(\tau_n)$. $p(y | x) = \frac{1}{Z} \sum_{\pi \in \Pi(x,y)} \exp (score(\pi))$\\
+\begin{comment}
+	$\pi$ denotes a sequence of state transitions for a sequence given input tokens x xand output tokens y.
+	The normalizer Z is again infinite, since there may be loops in the finite state machine.\\
+\end{comment}
+
+$Z = \sum_{y' \in \Omega*} \sum_{\pi' \in \Pi(x,y')} \exp (\sum_n^{|\pi'|} score(\tau_n))$
+
+
+
+\textbf{FW Algo:} $\forall i,j,k \text{ } if(dist[i][j] > dist[i][k] + dist[k][j])\\\text{ then } dist[i][j] \leftarrow dist[i][k] + dist[k][j]$\\
+\begin{comment}
+	Finds shortest paths between all pairs of vertices, thereby the transitive closure of a graph, in $O(n^3)$.\\
+\end{comment} 
+
+\textbf{MM-Semiring:} $\text{for } i \text{ to N}, \text{for } p \text{ to P} \\
+\text{sum}\leftarrow \textbf{0}\\
+\text{for } m \text{ to M}\\ 
+\text{sum}\leftarrow \text{sum} \oplus (sum,A[n][m] \otimes B[m][p])\\
+C[n][p]$\\
+\begin{comment}
+	In the second loop, we initialize a sum with $\bar{0}$, which is written to $C[i][j]$.
+	Depending on the semiring, this sum captures different properties of the weighted graph.\\
+\end{comment} 
+
+\textbf{FW-MM:} $\forall i,j,k \text{ } \oplus (sum,W^{k-1}[i][k] \otimes W^{1}[k][j])$\\
+
+
+\textbf{Kleene *:} $W^* = \oplus_{k=0}^\infty W^k = I+WW^* \Leftrightarrow W^* = (I-W)^{-1}$, semiring-closed if it has such a closure\\
+Only $W^*$ we should know is $\frac{1}{1-X}$\\
+\begin{comment}
+	The last equation comes from the geometric series.\\
+\end{comment} 
+
+\textbf{Warshall-Floyd-Kleene:} $\forall i,j,k \text{ } dist[i][j] \leftarrow dist[i][j]\oplus (dist[i][k] \otimes dist[k][k]^* \otimes dist[k][j])$
+
+
+
+
+
+
+
+
+

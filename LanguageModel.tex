@@ -1,0 +1,125 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Language Model/ Structured Prediction}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Structured Prediction
+	\begin{itemize}
+	\item What is it
+	\item Kleene Closure
+	\item Prefix Tree
+	\item Local Normalization
+	\end{itemize}
+	
+	\item Neural n-gram models
+	\begin{itemize}
+	\item n-gram Language Modelling
+	\item Log-Linear and MLP
+	\item Linguistic Limitations
+	\end{itemize}
+	
+	\item Recurrent Neural Networks
+	\begin{itemize}
+	\item Elman networks (Vanilla RNN)
+	\item GRUs and LSTMs
+	\item Backpropagation Through Time
+	\end{itemize}
+	\end{itemize}
+\end{comment}
+
+Use structure of exp. large output space to compute normalizer\\
+
+\textbf{Kleene V$^*$:} Infinite amount of finite-length strings from V\\
+\begin{comment}
+	Using BOS and EOS as delimiter, it can be seen as a prefix tree.
+	Each leaf is an EOS token.
+	The number of paths through the tree is infinite, whereas each path is finite.
+	A Language model is a weighting of this tree, more precise, a weighting of the edges of the tree. We Need to normalise a specific path with the weight of all paths.\\
+\end{comment}  
+
+\textbf{Language Model:} Weighted prefix tree, each sentence is unique path\\
+$p(y) = \frac{1}{Z} \prod_{t=1}^{|y|} weight_{y'_{\leq t}}$, 
+$Z = \sum_{y' \in V^*} \prod_{t=1}^{|y'|} weight_{y'_{\leq t}}$\\
+\begin{comment}
+	The sum of the product of the edges of all possible paths.\\
+\end{comment} 
+
+\textbf{Local Normalizer:} Z=1 when sum of all children is 1\\
+\begin{comment}
+	Every nodes has a distribution over edges that come out of that node. This means that the sum of all edges leaving a node is equal to 1.\\
+	We must have the condition that every leaf is EOS, e.g. that every path is finite length. Otherwise we could loose probability mass and it is not a distribution anymore.\\
+\end{comment} 
+
+\textbf{Consistency Cond:} $p(EOS|y_{<t}, V^*) > \epsilon > 0$,\\
+$p(|y| = \infty) \leq \lim_{t\rightarrow \infty} (1- \epsilon)^t = 0$, also called tight\\
+\begin{comment}
+	In other words, if a language model assigns positive probability to a string of infinite length, it is inconsistent.
+	We call a locally normalized language model tight if the normalizer sums to one and does not loose probability mass.\\
+\end{comment} 
+
+
+\textbf{Chain Rule:} $p(BOS a b EOS) = p(EOS | b a BOS) \cdot p(b | a BOS) ..$\\
+
+\subsection{N-Gram modeling}
+$p(y_t | y_{<t}) = p(y_t | y_{t-1}, .., y_{t-n+1}) = \frac{\exp (w_{y_t} \cdot h_t)}{\sum_{y' \in V} \exp(w_{y'} \cdot h_t)}, h_t \in \mathbb{R}^d$\\
+\begin{comment}
+	Idea: ensure a finite history to make modelling easier.\\
+	The parameter of the model is w, a word vector, and h is the n-gram context vector, both get learned by backpropagation.\\
+	Dot product stands for similarity: Words that are more similar to context vectors get higher probability.\\
+\end{comment} 
+
+\textbf{Sentence:} $p(y_1, ..., y_T) = \prod_{t=1}^T p(y_t | y_{t-1}, ..., y_{t-n+1})$\\
+\begin{comment}
+	If we want to model the joint distribution in a large Vocabulary, the parameters can explode. Assume V=1000 and n=10, we already have $1000^10$ parameters.\\
+\end{comment} 
+
+\textbf{Bengio:} $h_t = f(e(hist))$, $e(hist) = [e(y_{t-1}); e(y_{t-2}); e(y_{t-3})]$
+\begin{comment}
+	We have the e function that places each word from the history in an embedding, and then concatenates them together.
+	The concatenation is also called pooling.
+	This is then fed into a neural network f, so h = f(e(history)). 
+	This output is then used in a softmax to make a distribution, as seen in p(y|...).
+	The parameters can be trained by maximizing the log-likelihood through backprop.\\
+	Limitation: Fixed context frame!\\
+\end{comment} 
+
+\textbf{Learning:} Embedding $\rightarrow$ Pooling $\rightarrow$ NN + Softmax\\
+
+\subsection{Recurrent Neural Network}
+\textbf{Idea:} $h_t = f(h_{t-1}, e(y_{t-1})))$, $p(y_t | y_{< t}) = \frac{\exp(\omega_{yt} \cdot h_t))}{\sum_{y' \in V} \exp(\omega_{y'} \cdot h_t)}$\\
+\begin{comment}
+	We are passing a hidden state $h_{t-1}$ with every $y_{t-1}$ into the network, to generate a new hidden state $h_t$.
+	This method implicitly models an infinite context.
+	The NN f models how we combine the recurrent (history) part of the model with the embedding of the current input.\\
+\end{comment} 
+
+
+\textbf{Vanilla RNN:} $h_t = \sigma(W_1 h_{t-1} + W_2 e(y_{t-1}))$\\
+
+
+\textbf{Backprop:} Unroll NN through time, add up grads of timesteps.\\
+\begin{comment}
+	We unroll the iterations through time. 
+	This means, that the same parameters are used multiple times. 
+	We get the gradient by adding up the gradients of the parameters of all the timesteps.\\
+\end{comment} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

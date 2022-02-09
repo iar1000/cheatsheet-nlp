@@ -1,0 +1,100 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Dependency Parsing}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Dependency Parsing
+	\begin{itemize}
+	\item Definition
+	\item Projectivity
+	\item Graph-based dependency Parsing
+	\end{itemize}
+	
+	\item Probabilistic Inference
+	\begin{itemize}
+	\item Learning Objective
+	\item Matrix Tree Theorem
+	\end{itemize}
+	
+	\item Decoding Trees
+	\begin{itemize}
+	\item MST Algorithm
+	\item Root Constraint
+	\end{itemize}
+	
+	\end{itemize}
+\end{comment}
+
+\begin{comment}
+	Alternative tradition to constituency grammar. 
+	Every word is linked to it's syntactic head, whereas each connection between words has a superior and an inferior term. \\
+\end{comment} 
+
+\textbf{Dependency Tree:} Directed spanning tree, root degree 1\\
+Number of spanning trees is $O((n-1)^{n-2})$\\
+\begin{comment}
+	The relations between words, indicated by arches, are directed and labeled, e.g. noun-modifier, determiner, object, etc.\\
+	Without further non-terminals, CFG does not provide information about syntactic heads. On the other hand, the dependency tree of it will not provide information about constituency structure.
+	Conversion from constituency tree to dependency tree is mostly done using heuristics. A triangle tree structure, A->B, A->C can be translated to two versions of a dependency structure, B->C or C->B. Often only one makes grammatically sense, f.e. B = red, C = dog, Noun typically must be the head of the NounPhrase.\\
+\end{comment} 
+
+\textbf{Projective:} No crossing arcs 
+\textbf{Non-projective:} Crossing arcs \\
+\begin{comment}
+	Projective trees are closely related to constituency trees with heads, whereas non-projective trees are closely related to discontinous consituents.\\
+	The CYK algorithm can be adapted to find projective dependency trees.
+	Finding non-projective trees works best with drawing the arcs.\\
+\end{comment} 
+
+\subsection{Non-projective Trees/ Edge-factored}
+$p(t|w) = \frac{1}{Z} \prod_{(i \rightarrow j) \in t} \exp(score(i,j,w)) \exp(score(r,w))$\\
+$Z = \sum_{t' \in \mathcal{T}(w)} \prod_{(i \rightarrow j) \in t'} \exp(score(i,j,w)) \exp(score(r,w))$\\
+Computing determinant in $O(n^3)$\\
+\begin{comment}
+	Number of spanning trees with root constraint are $(n-1)^{n-2}$, putting a naive approach for computing the normalizer into $O(n^n)$\\
+	\textbf{Edge factor assumption:} The score factors over the edges in the tree \\
+\end{comment} 
+
+
+\textbf{Matrix:} $A_{ij} = \exp(score(i,j,w))$, $\rho_j = \exp(score(j,w))$\\
+Z=$det(L): L_{ij}=\rho_j (i=1), \sum_{i'=1, i' \neq j} A_{i'j} (i=j), -A_{ij} (else)$\\
+\textbf{Train:} $\sum_{i=1} \log p(t^{(i)}| w^{(i)}) = \sum_{i=1} score(t^{(i)}, w^{(i)}) - \log Z(w^{(i)})$\\
+\begin{comment}
+	$\rho$ is the root score.\\
+	Calculating the normalizer over $O(n^n)$ trees reduces to the calculation of the determinant of L in $O(n^3)$.
+	Training such a probabilistic non-projective parser is done by optimizing the log-likelihood $\sum score(t^{(i)}, w^{(i)}) - \log Z(w^{(i)})$ \\
+\end{comment} 
+
+\textbf{Decoding:} $\arg \text{max}_{t \in \mathcal{T}} \sum_{(i \rightarrow j) \in t} score(i,j,w)$\\
+\begin{comment}
+	All words are present as a node (fully connected). The root node has a connection to all nodes. Each connection is weighted.
+	The goal is to find the maximum-weight directed spanning tree subject to a root constraint.
+	All root nodes must have exactly one incoming edge, no cycles allowed, only one outgoing edge from the root.\\
+\end{comment}
+
+\textbf{Algo:} Max incoming edge, contract cycles (update weights)\\
+\begin{comment}
+	Greedily picking the maximum weighted edge wich is not creating a circle works only in the undirected case. In the directed case it fails, proof by counter example.\\
+	Use the maximum incoming edge of each node, if they form a tree, we have a MST. If not, there is a cycle. 
+	Contract The cycle by combining it to one huge node, with the incoming edges weights adjusted to the weights of the internal edges of the broken cycle. Algorithm runs in $O(n^2)$\\
+\end{comment} 
+
+\textbf{Root Const:} $\forall$ root edges, remove cheapest removal cost.\\
+\begin{comment}
+	If we have two edges from the root, we take a look at where they are pointing to. For each edge, we compare it to all other incoming weights of the destination, and take the difference. Thats what we loose by removing this edge. We remove the lowest cost edge and contract if necessary.\\
+\end{comment} 
+
+
+
+
+
+
+
+
+

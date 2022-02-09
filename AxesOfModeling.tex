@@ -1,0 +1,134 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Axes of Modeling}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Problem definition
+	\begin{itemize}
+	\item Understanding your Problem
+	\end{itemize}
+	
+	\item Choosing a model
+	\begin{itemize}
+	\item Probabilistic vs. non-probabilistic
+	\item Structured Predicition
+	\end{itemize}
+	
+	\item Loss and Evaluation
+	\begin{itemize}
+	\item Loss Functions
+	\item Regularization
+	\item Evaluation Metrics
+	\end{itemize}	
+	
+	\item Model Selection
+	\begin{itemize}
+	\item Importance of Model selection
+	\item Significance Testing
+	\end{itemize}
+	\end{itemize}
+\end{comment}
+
+\begin{comment}
+	Most problems boil down to find a mapping $f: \cX \rightarrow \cY$.\\
+	How is the task characterised? Classification, Structured Prediction, representation learning...\\
+	What's the metric of success? How are we optimizing for it?\\
+	How do we choose the final f?\\
+\end{comment}
+
+\textbf{Prob:} Make use of probability theory for learning, but needs assumptions\\
+\begin{comment}
+	In this class, we saw the discriminative approach, e.g. Conditional Random Fields and Recurrent Neural Networks. Also the generative approach, e.g. N-gram Models, Markov Random Fields and Recurrent Neural Networks.\\
+\end{comment} 
+
+\textbf{Non-Prob:} Interpretable, but what is uncertainty?\\
+The perceptron and the Support vector machine learned the parameters, whereas for the Context free grammars and the Linear Indexed Grammars, we manually crafted the rules.\\
+
+\textbf{Disc./Gen.:} Model boundary vs. own distribution\\
+
+\textbf{Structured Prediction:} Leverage to decompose large spaces\\
+\begin{comment}
+	We saw locally normalised and globally normalised structured predictions.\\
+	Local normalisation is efficient to train, since only the prediction at the current state matters, but they lead to biased predictions.\\
+	Global normalisation weights the scores at each timestep independently, but one needs to compute a global normalisation constant.\\
+	Key is most of the time the independence assumption. If we don't make them the model parameters may explode.\\
+	It is often good and performance increasing to include assumptions about the problem we have.\\
+\end{comment}
+
+\textbf{Loss function:} Quantify (mis)fit of the model\\
+\begin{comment}
+	The Model does not imply the loss function, we have different options. 
+	It always depends on what we want to achieve.
+	We try to quantify the goodness through the loss function.\\
+	\textbf{Common Properties:} Convexity, Differentiability, Guarantees, complexity..\\
+	\textbf{MLE:} Minimising $-\log p(D|\theta)$ is efficient to evaluate and has lowest KL-Divergence.
+	It can easily overfit on limited data.\\
+\end{comment}
+
+\textbf{LogLoss:} $l(y, y') = \log(1 + e^{-y\cdot y'})$
+\textbf{Exp-Loss:} $l(y, y') = e^{-y\cdot y'}$\\
+
+\textbf{Regularization:} Add L1 or L2 weight penalties\\
+\begin{comment}
+	In NN we have enough parameters to overfit the data, with weight penalties, we introduce a penalty when the noise is fitted to closely. The regularizations can be seen as prior assumptions of the weights in the bayesian setting.
+	Other forms of penaltisation are Weight Decay, Dropout and Early Stopping.\\
+\end{comment}
+
+\textbf{Prec:} $\frac{P_{true}}{P_{All}}$, \textbf{Recall:} $\frac{P_{true}}{P_{true} + N_{false}}$ \textbf{Acc:} $\frac{P_{true} + N_{true}}{N}$\\
+\textbf{F-score:} $\frac{(1+\beta^2)(prec \cdot recall)}{\beta^2 prec + recall}$\\
+\begin{comment}
+	The F-score models a tradeoff between the precision and the recall.\\
+\end{comment}
+
+\begin{comment}
+	\textbf{Intrinsic vs. Extrinsic:} Evaluate based on an appropriate metric or the performance of the final task.\\
+\end{comment}
+
+
+\textbf{Model Selection:} Goals are inference and prediction\\
+\begin{comment}
+	Inference is explaining the underlying process how the data was generated, we want the model that does this best.
+	The predictive performance is meassured on data it has never seen before.\\
+	Models can be good for one metric, but bad for the other. For example, NN's often perform very good, but can't describe the underlying process due to a lack of interpretability.\\
+	
+	\textbf{Issues:} Multiple testing with the same parameters increase the probability for a statistical outliner. 
+	Another reason for overestimation of the performance is when the model has access to the test data, therefore overfitting to it.
+\end{comment} 
+
+\textbf{Cross-validation:} Split data into k-folds and evaluate\\
+\textbf{Statistical tests:} Choose test Statistic Z and significance level $\alpha$ to compare classifiers.\\
+
+\textbf{Significa:} $p = 2min(P(T\geq t | H_0), P(T\leq t| H_0))$, Rej. $p<\alpha$\\
+Reject if $H_0$ iff $p<\alpha$, power = $P(\text{reject } H_0 | H_1)$
+\begin{comment}
+	The statistical power increases with increasing sample size.\\
+\end{comment}
+
+\textbf{Multiple tests:} $P(|\text{False Rejections}| > 0) = 1 - P(|\text{False Rejections}| = 0) = 1-(1-\alpha)^K$\\
+
+\textbf{Parametric Tests:} t-test, belongs to parametric family.\\
+\textbf{Non-parametric test:} statistic follows a specific distribution, but parameter of the distribution is not a function of the data.\\
+
+\textbf{Bonferroni correction:} $\alpha^* = \alpha/K$
+
+\textbf{Permutation:} $p^*$ from og-dataset, p-value $= \frac{|\{ i:p_i \leq p^* \}| + 1}{k+1}$\\
+\begin{comment}
+	We evaluate p* on our original dataset. We then permute the labels y randomly k times, train the model again, and compute the error $p_k$ for every permutation. 
+	The empirical p-value is the computed as stated above, measuring whether a classifier performs better than random chance.\\
+\end{comment}
+
+\textbf{McNemar's test:} C1 correct prediction/C2 correct prediction = a, C1 in-correct prediction/C2 in-correct prediction = d, C1 correct prediction/C2 in-correct prediction = c, C1 in-correct prediction/C2 correct prediction = b. 
+$H_0: p_b = p_c, H_1: p_b \neq p_c$, statistics $\cX^2 = \frac{(b-c)^2}{b+c} \sim \cX_1^2$, for b,c $\geq 25$
+
+\textbf{5x2cv:} $\bar{p} = \frac{p^{(1)} + p^{(2)}}{2}$, $s^2 = (p^{(1)} - \bar{p})^2 + (p^{(2)} - \bar{p})^2$, $t = \frac{p^{(1)}_1}{\sqrt{\frac{1}{5} \sum s_i^2}} \sim t^5$\\
+\begin{comment}
+	We do 5 iterations, where each iteration we split the dataset in two folds. For each fold compare performance between two classifiers and obtain the test statistic.\\
+\end{comment}
+
+

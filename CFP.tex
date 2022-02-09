@@ -1,0 +1,141 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Context-Free Parsing with CKY}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Syntactiv Constituency
+	\begin{itemize}
+	\item Definition
+	\item Ambiguity in Language
+	\item Constituency Tests
+	\end{itemize}
+	
+	\item Context Free Grammars
+	\begin{itemize}
+	\item Formal Equation
+	\item Weighted CFGs
+	\item The Parsing Problem
+	\end{itemize}
+	
+	\item Parsing
+	\begin{itemize}
+	\item Definition
+	\item Examples
+	\end{itemize}
+	
+	\item CKY Algorithm
+	\begin{itemize}
+	\item Requirements
+	\item In Action
+	\end{itemize}
+	\end{itemize}
+\end{comment}
+
+\begin{comment}
+	Mathematical study of structure of sentences. There is evidence that human language is structured hierarchically. A good way to model this is by breaking the language into constituents and expressing their relationship.\\
+\end{comment} 
+
+\textbf{Constituents:} Multi-word units that function as a single unit.\\
+\begin{comment}
+	John speaks [spanish], [spanish and french]. \\
+	$\text{[Fruit flies] [like [a green banana]] or Fruit [flies [like[a green banana]]]}$\\
+	There can be large ambiguity in a sentence, mainly due to attachment of the preposition $[\text{in my pajamas}]$, or the modifier scope $\text{[plastic cup holder]}$.\\
+\end{comment} 
+
+\textbf{Pronoun substitution:} She ate fruit- She ate it. 
+\textbf{Clefting:} John loves fruit- It is fruit that John loves.
+\textbf{Answer Ellipsis:} Papa eats caviar with a spoon- How does Papa eat caviar?\\
+
+\subsection{Context-Free Grammars}
+\textbf{Grammar:} Set of rules to form a string from a vocabulary.\\
+\begin{comment}
+	There are terminal and not-terminal symbols. Nonterminal symbols can be exchanged with vocabulary tokens. 
+	If there is more than one way of generating the same string, the grammar is said to be ambiguous.\\
+\end{comment} 
+
+\textbf{CFG:} $G = \langle \mathcal{N}, \mathcal{S}, \Sigma, \mathcal{R} \rangle$\\
+\begin{comment}
+	Non-terminal symbols, special start symbol, alphabet of terminals and production rules.\\
+	Encodes a subset of $\Sigma^*$\\
+\end{comment} 
+
+\textbf{Chomsky Normal form:} All rules are $N_1 \rightarrow N_2N_3$ or $N \rightarrow a$\\
+\begin{comment}
+	We can represent string generation as tree, each node is a constituent, shows the syntactic structure and derivation under the grammar.
+	For every context free grammar, we can find a grammar in CNF. For any grammar in CNF, we can find a grammar G' that accepts the same set of strings, maybe different trees though.
+	There are about $O(4^N)$ many trees for a sentence in CNF.\\
+\end{comment} 
+
+\textbf{Weighted:} Globally normalized: $p(t) = \frac{1}{Z}\prod_{r \in t} \exp (score(r))$\\
+$Z = \sum_{t' \in \cT} \prod_{r' \in t'} \exp (score(r'))$, can be infinitely big\\
+\begin{comment}
+	The outcome of the production rules can be assigned probabilities, which is also a form of weighting. 
+	The probability of a tree can then be derived by multiplying the probabilities of the nodes together.\\
+	Instead of probabilities, the rules can also be assigned generic positive weights. 
+	Weighted Grammar normaliser is $Z = \sum_{t' \in \mathcal{T}}\prod_{r' \in t'} \exp (score(r'))$.
+	The normaliser is then an infinite sum and can even be bigger than $\Sigma^*$, due to ambiguities in the creation of a string. Assume production rules $S \rightarrow S$ and $S \rightarrow a$.\\
+\end{comment} 
+
+\textbf{Probabilistic:} Locally normalized probabilistic weights. Normalization over $O(4^N)$ trees with yield s, not all of them.\\
+\begin{comment}
+	For a production rule $N\rightarrow a_1 | ... | a_k$, it must hold that $\sum^K p(\alpha_k | N) = 1$\\
+\end{comment} 
+
+\subsection{Parsing Problem}
+\begin{comment}
+	\textbf{Goal:} Take an input sequence, produce a parse tree.\\
+\end{comment} 
+
+
+$p(t|s) = \frac{\prod_{(X \rightarrow Y Z) \in t} \exp(score(X \rightarrow YZ))  \cdot   \prod_{(X \rightarrow x) \in t} \exp(score(X \rightarrow x))}{\sum_{t' \in \mathcal{T}(s)} \prod_{r' \in t'} \exp(score(X \rightarrow YZ))  \cdot   \prod_{(X \rightarrow x) \in t'} \exp(score(X \rightarrow x))}$\\
+\begin{comment}
+	This is different than normalising over infinite strings as seen in the WCFG before.\\
+	T(s) is the set of trees that have the yield s, e.g. all trees that form the sentence s.
+	The normalizer can still diverge, for example the grammar $S \rightarrow S$, $S \rightarrow a$ forming string "a".\\
+	We already build in the structural assumption along the production rules of the grammar and that the grammar is in CNF. 	Note that the number of trees is no longer infinite, since there are no cyclic rules.\\
+\end{comment} 
+
+\textbf{CKY:} Loop span-length, vertical and horizontal combs, $O(N^3|R|)$, needs CNF (can be converted)\\
+\begin{comment}
+	If a grammar is CNF, the dynamic program is computing the normalizer of the parser Z.
+	Since it is a dynamic program, we can also semi-ringify it, computing the best parse or others.
+	The runtime of the algorithm is $O(N^3 |R|)$.\\
+\end{comment} 
+
+for $n=1,..,N$: for $X \rightarrow s_n \in \cR:$\\
+chart[n, n+1,X] $\oplus$= exp(score($X\rightarrow s_n$))\\
+for $span = 2,..,N:$, for $i = 1,..,N-span:$\\
+$k \leftarrow i + span$\\
+for $j = i+1,.., k-1:$\\
+for $X \rightarrow Y \text{ } Z \in \cR$:\\
+chart[i,k,X] $\oplus$= $\exp \{ score(X \rightarrow Y \text{ } Z) \} \otimes \text{chart}[i,j,Y] \otimes \text{chart}[j,k,Z]$\\
+
+\textbf{Best parse:} Semiring with (max, +)\\
+
+\textbf{Train:} $\sum_{i=1}^I \log p(t^{(i)} | s^{(i)}) = \sum_{i=1}^I score(t^{(i)}, s^{(i)}) - \log Z(s^{(i)})$\\
+\begin{comment}
+	To optimize the scores, we can run backpropagation on the log-likelihood as seen before.
+\end{comment}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

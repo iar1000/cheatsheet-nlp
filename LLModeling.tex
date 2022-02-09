@@ -1,0 +1,143 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Log-Linear Modeling}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Probability refresher
+	
+	\item Log-Linear Models
+	\begin{itemize}
+	\item Why Log, Why Linear?
+	\item Regression/ Classification
+	\item Maximum Likelihood
+	\end{itemize}
+	
+	\item Softmax
+	\begin{itemize}
+	\item Definition
+	\item Gradient
+	\end{itemize}
+	
+	\item Exponential Family
+	\begin{itemize}
+	\item Definition and Properties
+	\item Conjugacy
+	\item Max entropy derivation
+	\item Connection to LL-Models
+	\end{itemize}
+	
+	\end{itemize}
+\end{comment}
+
+\textbf{Frequentist way:} Rel. frequency of an event with infinite data\\
+
+\textbf{Bayesian way:} Degree of uncertainty about an event\\
+
+\textbf{Sample Space $\Omega$:} Set of all possible outcomes\\
+
+\textbf{Event Space E:} Subset of the powerset($\Omega$)\\
+
+\textbf{Probability Function p:} $\forall e \in \Sigma, p(e) \in [0,1]$\\
+
+\textbf{Random Variable:} $X: \Omega \rightarrow T$, map to target space T\\
+\begin{comment}
+	Assume tossing of two coins and counting the number of heads, f.e. X(ht) = 1. 
+	Target space is {0,1,2}.\\
+	$\Rightarrow$ A random variable is a deterministic function, not a random variable.\\
+	\textbf{Note:} Independence and correlation are properties of random variables, not the action space. We use Random variables to model properties of elements of the sample space.\\
+\end{comment}
+
+\textbf{Axioms:} Non-negativity: $p(X=x) \geq 0$, 
+Sums to 1: $\sum_{x\in X} p(X=x) = 1$, 
+Countable Additivity: $P(X=x \lor Y=y) = p(X=x) + p(Y=y) - p(X=x \land Y=y)$\\
+\begin{comment}
+	If all events are disjoint, then $p(\cup_i X_i) = \sum_i X_i$\\
+\end{comment}
+
+\textbf{Marginalisation:} $p(x) = \sum_y p(x,y) = \int p(x,y)dy$\\
+
+\textbf{Bayes:} $p(y|x) = \frac{p(x|y) p(y)}{\int p(x|y)p(y) dy}$\\
+
+\textbf{Expectation:} $\mathbb{E}[f(x)] = \sum_x f(x)p(x) = \int_x f(x)p(x) dx$\\
+(Variance: $f(x) = (x - \mu_x)^2$, Mean: $f(x) = x$)
+\textbf{Axioms:} Linearity: $\mathbb{E}[c\cdot f(x)+ g(x)h(x)] = c\mathbb{E}[f(x)] + \mathbb{E}[g(x)]\mathbb{E}[h(x)]$\\
+
+
+
+%------------------------%
+%------------------------%
+%--Log-Linear Modeling---%
+%------------------------%
+%------------------------%
+\subsection{Log-Linear Modeling}
+
+\textbf{Discrete MLE:} $p(y|x) = \frac{count(x,y)}{count(x)}$\\
+\begin{comment}
+	Shortcomings: Very limited model. Can't interpolate from sparse training data, e.g. if an x,y doesn't show up, it is assumed to be an impossible combination.\\
+\end{comment} 
+
+\textbf{Exponential Model:} $p(y|x) \propto \exp score(x,y) \geq 0$, convex\\
+\begin{comment}
+	Exponentiation ensures non-negativity\\
+\end{comment} 
+
+\textbf{Linear Scoring:} $score(x,y) = \sum^K_{k=1}\theta_k \cdot f_k(x,y) > 0$\\
+
+\textbf{LLM:} $p(y|x,\theta) = \frac{\exp (\theta \cdot f(x,y))}{Z(\theta)}$, $Z(\theta) = \sum_{y' \in Y} \exp (\theta \cdot f(x,y'))$\\
+\begin{comment}
+	Taking the log of this model makes it linear: $\log p(y|x,\theta) = \theta \cdot f(x,y) + const$.
+	The normalisation constant is not always tractable and computed in $O(|Y|)$. \\
+\end{comment} 
+
+\textbf{MLE:} $\theta_{MLE} = \arg \min_{\theta} -\sum_{n=1}^N \log p(y_n|x_n, \theta)$, $\{(x_n, y_n)\}^N_{n=1}$\\
+$\frac{dL(\theta)}{d\theta_k} = -\sum_{n=1}^N f_k(x_n, y_n) + \sum_{n=1}^N \sum_{y'\in Y} p(y'| x_n;\theta)f_k(x_n, y')$ \\
+\begin{comment}
+	The exponential function is convex, which leads to a global optimum.\\	
+	The first part of the gradient describes the observed feature counts, whereas the second part describes the expected feature counts. We want them to be the same $\Rightarrow$ Expectation matching.
+	This function is easily derived by plugging in the exponential model into the loss function.\\
+\end{comment} 
+
+\textbf{Feature Function:} Preprocessing and feature design\\
+\begin{comment}
+	Preprocessing converts raw text into a form that makes feature design easy, f.e: Tokenization, Lower casing, stemming, Stop-word removal.\\
+	Feature designs: n-grams, One-Hot, Bag of words, word-embeddings, Domain-specific features.\\
+\end{comment}
+
+
+%------------------------%
+%------------------------%
+%---------Softmax--------%
+%------------------------%
+%------------------------%
+\subsection{Softmax}
+\textbf{Softmax(h,y,T)}  = $\frac{\exp(h_y/T)}{\sum_{y' \in Y} \exp(h_{y'}/T)}$, $h=\theta \cdot f(x,y)$\\
+$T \rightarrow 0$: The formula can be re-written as $\frac{1}{1 + \exp(\frac{h_{y_2} - h_{y_1}}{T})}$\\
+\begin{comment}
+$T \rightarrow \infty$: The value of $h_y$ gets less and less important, it converges to a uniform distribution.\\
+$T \rightarrow 0$: The formula can be re-written as $\frac{1}{1 + \exp(\frac{h_{y_2} - h_{y_1}}{T})}$. The difference of the h's get amplified by the small T value and therefore produce an argmax.\\
+\end{comment} 
+
+
+$\log softmax = h_y - \log \sum_{y' \in Y} \exp(h_{y'})$\\
+
+$\frac{\delta \log softmax(h, y)}{\delta \theta} = f(x,y) - \sum_i softmax(\theta^T f(x,y), i)) f(x,i)$\\
+%\todo{What does this conceptually mean? Where does this gradient point to?}
+
+\textbf{Exp. Family:} $p(x|\theta) = \frac{1}{Z(\theta)} h(x) \exp(\theta \cdot \phi(x))$\\
+\begin{comment}
+	This is the same as we have seen before, y is part of $\theta$, and $\phi$ is the feature function in our case.\\
+	We like exponential distributions, because they have conjugate priors. This helps in Machine Learning tasks to get a "good" posterior which is explicitly computable.\\
+\end{comment} 
+
+\textbf{Max. Entropy:} $H(p) = -\sum_{x\in X} p(x) \log p(x)$\\
+\begin{comment}
+	Suppose we know the expectation, but not the underlying distribution. 
+	We should always pick the distribution that, given the data, models the most uncertainty in unknown data points. This translates to probabilities closest together.
+	This makes sure that we don't include bias. Laplace’s “Principle of Insufficient Reason” stipulates that if we have no reason to believe otherwise, we should assign equal probability to each event.\\
+\end{comment} 

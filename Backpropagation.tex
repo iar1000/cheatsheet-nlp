@@ -1,0 +1,68 @@
+\section{Backpropagation}
+\begin{comment}
+	It is a technique that exploits the composite nature of functions by propagating the chain rule using dynamic programming.\\
+\end{comment}
+
+\textbf{Parameter estimation:} $\min_\theta \sum_{(x,y) \in \cD} L(f(x;\theta), y)$\\
+\begin{comment}
+	Usually optimized by gradient descent, update $\theta$ with the gradient of the loss-function.\\
+\end{comment}
+
+
+\textbf{Chain rule:} $\frac{d}{dx}[f(g(x))] = f'(g(x))g'(x)$\\
+
+\textbf{f':} $f'(x) = \lim_{h \rightarrow \infty} \frac{f(x + h) - f(x)}{h}$, $f(x) \approx f(x_0) + f'(x_0)(x - x_0)$\\
+\begin{comment}
+	This is simple Taylor approximation, the error term is in $\cO(x-x_0)^2$.\\
+\end{comment}
+
+\textbf{Jacobian:} $f: \cR^n \rightarrow \cR^m$, $\frac{dy}{dx} = [ \frac{dy}{dx_1},.., \frac{dy}{dx_n} ] \in \cR^{m\times n}$\\
+
+\textbf{Mutlivariate Chain Rule:} $\frac{dy_i}{dx_j} = \sum^m_{k=1} \frac{dy_i}{dz_k}\frac{dz_k}{dx_j}$\\
+%\todo{Create a graph of a jacobian}
+
+\textbf{Chain Rule (Bauer):} $\frac{dy_i}{dx_j} = \sum_{p \in \cP(j,i)} \prod_{(k,l) \in p} \frac{dz_l}{dz_k}$\\
+\begin{comment}
+The partial derivative is the sum over all paths in a computation graph.
+$\cP(j,i)$ denotes the set of Bauer paths, with a worst case size in $\cO(m^n)$ (n layers and m nodes per layer).\\
+\end{comment}
+
+\textbf{Computation Graph:} Labeled, directed acyclic hypergraph w/ function nodes, input edges. \\
+\begin{comment}
+Edges describe the flow of variables into the functions.
+Backpropagation can leverage this, assigning each edge a local derivation between the nodes as well.
+Hypergraph means that edges can have multiple sources and targets, e.g. a variable can flow into multiple functions.\\
+\end{comment}
+
+\textbf{Backprop:} Apply chain rule along computation graph to compute gradients using dynamic programming.\\
+\begin{comment}
+The result of the Bauer paths starting from a certain node are summarized by storing the intermediate value. 
+This also holds for taking the partial derivative of it.
+The gradient can be computed in the same time complexity as f, as it uses the same components, although, the space complexity is higher, since the intermediate values must be stored as well. \\
+\end{comment} 
+
+\textbf{Forward:} Expand $\frac{d}{dx}$ recursively, same flow as forward pass.\\
+\begin{comment}
+The independent value is fixed. 
+The flow of computation is exactly as with the forward pass, and can be done in the same iteration. Compute the intermediate result AND the derivative of it, with respect to it's inputs.	
+The partial derivates can be stored as numerical value directly.\\
+\end{comment}
+
+\textbf{Reverse:} Do two passes, expand $\frac{dy}{d}$ recursively backwards\\
+\begin{comment}
+Also called reverse-mode automatic differentiation. 
+First path computes intermediate values, second path computes derivatives backwards.
+One must track the intermediate values and the composition of the sub-expressions to create the gradient in the backward path.
+Mix-and-match forward and backward propagation is NP-complete.\\
+\end{comment}
+
+\textbf{Sum:} $\frac{d(a+b)}{da} = \frac{da}{da	} + \frac{db}{da} = 1$,
+\textbf{Product:} $\frac{d(ab)}{da} = a\frac{db}{da	} + b\frac{da}{da} = b$\\
+
+log(1)=0, log(0)=$-\infty$, exp(0)=1, sin(0)=0, cos(0)=1
+
+
+
+
+
+ 

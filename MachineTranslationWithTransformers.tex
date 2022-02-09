@@ -1,0 +1,118 @@
+% for better visibility when space is not an issue
+\begin{comment}
+	\pagebreak
+\end{comment}
+
+\section{Machine Translation with Transformers}
+\begin{comment}
+\subsection{Structure}
+
+	\begin{itemize}
+	
+	\item Translation
+	\begin{itemize}
+	\item Task Definition
+	\item Problem Decomposition
+	\end{itemize}
+	
+	\item Sequence-to-Sequence Models
+	\begin{itemize}
+	\item Framework
+	\item The Attention Mechanism
+	\item Transformers
+	\end{itemize}
+	
+	\item Decoding
+	\begin{itemize}
+	\item Decoding as Graph Search
+	\item Common Strategies
+	\end{itemize}	
+	\end{itemize}
+\end{comment}
+
+\subsection{Translation}
+Translate a string in one language to a string in another language\\
+
+\textbf{Goal:} $y^* = \arg \max score(x,y)$, $\cY = \{ BOS \cdot v \cdot EOS | v \in \Sigma^* \}$\\
+\begin{comment}
+	We want to map strings in a source language to strings in a target language, where y is an element of $\cY$.
+	Often we cap the size of the strings.\\
+	The difference to transliteration is that the notion of correct is not as strong, since we here act in a space where ambiguity and flexibility of a language come into play.\\
+\end{comment} 
+
+\textbf{Transducer:} Split program to modeling (learn distribution), and decoding (generate according to scoring function)\\
+
+\textbf{Seq2Seq Model:} $z = encoder(x), y|x \sim decoder(z)$\\
+\begin{comment}
+	We can use a WFST framework, Statistical machine translation or a neural machine translation for this. We are going for the neural machine translation (NMT).\\
+	The problem is split up into Modeling a probability distribution (score function) and generating strings according to this scoring (decoding).\\
+	Most neural architectures follow such an encoder-decoder structure.\\
+	We start with an encoder, that maps a sentence to some representation z which is machine understandable. It is like a pre-processing step for the decoders.\\
+\end{comment}  
+
+$p(y|x) =\prod_{t=1} p(y_t| x, y_1,..,y_{t-1})$, Optimize LL\\
+\begin{comment}
+	To make our prediction of y at inference time, we generate $y_1$ according to $p(\cdot|x)$, $y_2$ according to $p(\cdot|x, y1)$, and so on.\\
+	This behaves like a RNN, we put x into the encoder and decode $y_1,..,y_T$ iteratively by conditioning on the previous y's.\\
+	\textbf{Limitation:} The main limitation is that the decoder only ever receives a single vector from the previous step, this is an information bottleneck.\\
+\end{comment}
+
+
+
+\textbf{Attention:} $\alpha^T V = \sum_i \alpha_i v_i^T$. $\alpha_i = softmax(score(q, k_i))$\\
+\begin{comment}
+	Assume $V \in \mathbb{R}^{n\times d}$ is the value table of a hash table and $\alpha \in \mathbb{R}^{n}$ is on-hot encoded indicating the position of the value. 
+	The multiplication retrieves exactly one vector with the "hard" value. 
+	If we use a continuous vector for alpha, we can "merge" together multiple entries of the value-table.
+	We want a soft version, because it is differentiable, and thus can be used for backpropagation.\\
+	\textbf{Framework:} We put in a query q and a key k, and score how similar they are. The alpha we get is then used to calculate the "soft" output over the values V.\\
+	In general K=V is produced by the encoder. q is produced by the decoder. \\
+\end{comment} 
+
+$k_i = v_i = h_i^{(e)}, q_t = h_t^{(d)}, K = V = H^{(e)}, c = \alpha^T V$\\
+$h_1^{(0)},h_2^{(0)},h_3^{(0)} \in \mathbb{R}^d$,$K=V=[h_1,h_2,h_3]$,$\alpha = softmax(K h_2^{(0)})$\\
+
+
+\subsection{Transformers}
+\begin{comment}
+	Transformers are NN's whose architecture is based on RNN transformers. The main advantage is that it is parallelizable, compared to the sequential running RNNs.\\
+\end{comment}
+\textbf{Word Embedding:}\\
+\textbf{Positional Embedding:} Encode position of the words.\\
+\begin{comment}
+	Transformers don't use a recurrent structure and therefore need a way to encode the word position. How important this is, is a different question.\\
+\end{comment}
+
+\textbf{Residual Connections:} Feed a layer directly farther down. This mitigates vanishing gradients.\\
+\begin{comment}
+	\textbf{Layer Normalization:} Instead of doing batch normalization, normalize inputs of the layer. The input of the layers change as the parameters of the previous layer change, this can lead to a covariance shift with cascading effect.\\
+\end{comment}
+
+\textbf{Self-attention:} \textbf{Add and Normalize:}\\
+
+\textbf{Decoding:} $y^* = \arg\max_{y \in \cY} score(x,y)$, w/o assumptions $O(|\Sigma|^{n_{max}})$ many paths\\
+\begin{comment}
+	We must choose $y_t$ with maximum likelihood at each step.\\
+	Can be interpreted as a graph search problem. In this instance, the outputs depend on all previous outputs, we do not make any independence assumptions.\\
+	This leads to every an explosion of the graph node, since every element of the vocabulary needs a connection to every element of the vocabulary at every step of the sequence $\Rightarrow O(|\Sigma|^{n_{max}})$.\\
+\end{comment} 
+
+\textbf{Beam Search:} Sample only k best at each timestep\\
+\begin{comment}
+	This is a greedy approach, but does quite well in practice.\\
+\end{comment} 
+
+\textbf{Sampling:} Sample from $p(y|x)$ at each timestep\\
+\begin{comment}
+	Evaluation of these methods is very difficult, it can't be done by maximizing the log-likelihood. 
+	There is the BLEU score, counts the fraction of n-grams that appear in the reference prediction, and the METEOR score, whatever this is doing.\\
+\end{comment} 
+
+
+
+
+
+
+
+
+

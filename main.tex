@@ -1,0 +1,406 @@
+\documentclass[a4paper,10pt,twoside]{extarticle}
+
+% PARAMETER TO GREY OUT TEXT
+\usepackage{etoolbox}
+\newtoggle{greytext}
+%\toggletrue{greytext}
+\togglefalse{greytext}
+
+% PARAMETER TO SHORTEN DOCUMENT
+\newtoggle{shortdocument}
+\toggletrue{shortdocument}
+
+% PARAMETER TO SHOW COMMENTS
+\newtoggle{showcomments}
+\toggletrue{showcomments}
+
+
+% DECREASE LINE SPACING IF REQUESTED
+\iftoggle{shortdocument}{
+\setlength{\baselineskip}{0pt}
+\renewcommand{\baselinestretch}{0.00001}
+}
+
+% PAPER LAYOUT
+\iftoggle{shortdocument}{
+\usepackage[margin=0.25cm,twoside]{geometry}
+}{
+\usepackage[margin=0.5cm,twoside,bindingoffset=9mm]{geometry}
+}
+
+% LANDSCAPE PACKAGE
+\usepackage{pdflscape}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\vspace*{-0.55cm}\colorbox{white}{\scriptsize\thepage}}
+\setlength{\footskip}{4pt}
+
+
+% COMMENTS (invisible)
+\usepackage{comment}
+
+% COLORS
+\usepackage{color}
+\usepackage{xcolor}
+
+% COLOR SHORTCUTS
+\iftoggle{greytext}{
+\newcommand{\tcr}[1]{\textcolor{lighttext}{#1}}
+\newcommand{\tcb}[1]{\textcolor{lighttext}{#1}}
+\newcommand{\tcg}[1]{\textcolor{lighttext}{#1}}
+\newcommand{\tcgr}[1]{\textcolor{lighttext}{#1}}
+\newcommand{\tcp}[1]{\textcolor{lighttext}{#1}}
+}{
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
+\newcommand{\tcb}[1]{\textcolor{blue}{#1}}
+\newcommand{\tcg}[1]{\textcolor{green}{#1}}
+\newcommand{\tcp}[1]{\textcolor{pink}{#1}}
+\newcommand{\tcgr}[1]{\textcolor{gray}{#1}}
+}
+
+% MULTICOLUMN LAYOUT
+\usepackage{multicol}
+\iftoggle{shortdocument}{
+\setlength\columnsep{10pt}
+}{
+\setlength\columnsep{20pt}
+}
+\setlength{\columnseprule}{0.1pt}
+\iftoggle{greytext}{
+\renewcommand{\columnseprulecolor}{\color{lighttext}}
+}{
+}
+
+% PARAGRAPH LAYOUT
+\setlength\parindent{0pt}	% indentation
+\setlength\parskip{2pt}		% space between paragraphs
+
+% LANGUAGE SETTINGS
+%\usepackage[ngerman]{babel} % Silbentrennung (und Deutsche Titel)
+\usepackage[utf8]{inputenc} % Umlaute
+
+% FONTS
+% font kerning (load after specific font!)
+\usepackage{microtype}
+
+% CUSTOM FONT SIZES
+\usepackage{relsize}
+
+% FIGURE SETTINGS
+\usepackage{pict2e} % load this before picture
+\usepackage{picture}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% TIKZ GRAPHICS
+\usepackage{tikz}
+\usetikzlibrary{calc,matrix,arrows,automata,fit}
+
+% PLOTS
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.10}
+
+% FLOAT SETTINGS
+\usepackage{float}
+
+% REFERENCING
+\usepackage{hyperref}
+
+% TABLES
+\usepackage{booktabs} % nicer tables
+\usepackage{array} % custom column types
+\usepackage{multirow} % span cells over multiple rows
+\newcommand{\tabitem}{~~\llap{{\boldmath $\cdot$}}~} % items in tables
+
+% LISTS
+\usepackage{enumitem}
+\setlist{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=10pt}
+\renewcommand\labelitemi{{\boldmath$\cdot$}}
+\renewcommand\labelitemii{{\boldmath$\cdot$}}
+\renewcommand\labelitemiii{{\boldmath$\cdot$}}
+% advantages disadvantages
+\newcommand\pro{\item[$+$]}
+\newcommand\con{\item[$-$]}
+
+% TIGHT CENTER ENVIRONMENT
+\newenvironment{tightcenter}{%
+  \begin{center}
+  \vspace{-12pt}
+}{
+  \vspace{-12pt}
+  \end{center}
+}
+
+% MATH FORMATING
+\include{math-shortcuts.tex}
+
+% ALGORITHMS
+\usepackage[ruled,vlined]{algorithm2e}
+\SetKwProg{Fn}{Function}{}{}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\SetKwInput{KwIn}{In}
+\SetKwInput{KwOut}{Out}
+\SetKw{KwBreak}{break}
+
+% PROGRAM CODES
+\usepackage{listings}
+\usepackage{courier}
+
+% global program code settings
+\lstset{
+ language          = C++, 
+ basicstyle        = \bfseries\footnotesize\ttfamily,
+ keywordstyle      = \color{blue}\footnotesize\bfseries\ttfamily,
+ stringstyle       = \color{red}\footnotesize\ttfamily,
+ commentstyle      = \color{magenta}\footnotesize\ttfamily,
+ morecomment       = [l][\color{magenta}]{\#},
+ showstringspaces  = false,
+ breaklines        = true,
+ breakatwhitespace = true,
+ breakindent       = 2ex,
+ tabsize           = 2,
+ mathescape        = true
+}
+% global inline code settings
+\newcommand\inlinestyle{\lstset{
+ basicstyle        = \bfseries\small\ttfamily,
+ keywordstyle      = \color{blue}\bfseries\small\ttfamily,
+ stringstyle       = \color{red}\small\ttfamily,
+ commentstyle      = \color{magenta}\small\ttfamily
+}}
+
+% pseudo code environment
+\lstnewenvironment{Code}[1][]{}{}        % boxed
+\newcommand{\code}[1]{{\inlinestyle\lstinline{#1}}}    % inline
+
+% C/C++ style for highlighting
+\newcommand\cppstyle{\lstset{
+ language=C++
+}}
+% C/C++ environments
+\lstnewenvironment{Cpp}[1][]{\cppstyle \lstset{#1}}{}
+\newcommand\Cppexternal[2][]{{\cppstyle \lstinputlisting[#1]{#2}}}
+\newcommand\cpp[1]{{\cppstyle\inlinestyle\lstinline!#1!}}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+ language=Python,
+ otherkeywords={self}             % Add keywords here
+}}
+% Python environments
+\lstnewenvironment{Python}[1][]{\pythonstyle \lstset{#1}}{}
+\newcommand\Pythonexternal[2][]{{\pythonstyle \lstinputlisting[#1]{#2}}}
+\newcommand\python[1]{{\pythonstyle\inlinestyle\lstinline!#1!}}
+
+
+% TODOS
+\iftoggle{greytext}{
+\newcommand{\todo}[1]{\textbf{TODO:} #1}
+}{
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+}
+
+% CUSTOM COMMANDS
+% package for conditional actions
+\usepackage{xifthen}
+% color definitions
+\iftoggle{greytext}{
+\definecolor{custtitlecolor}{rgb}{1, 1, 1}
+\definecolor{defcolor}{rgb}{0.97,0.97,0.97}
+\definecolor{thmcolor}{rgb}{0.97,0.97,0.97}
+\definecolor{excolor}{rgb}{0.97,0.97,0.97}
+\definecolor{importantcolor}{rgb}{0.97,0.97,0.97}
+\definecolor{algcolor}{rgb}{0.97,0.97,0.97}
+}{
+\definecolor{custtitlecolor}{rgb}{0, 0, 0}
+\definecolor{defcolor}{rgb}{0.75, 1, 0.75}
+\definecolor{thmcolor}{rgb}{1, 0.75, 0.75}
+\definecolor{excolor}{rgb}{1, 0.95, 0.43}
+\definecolor{importantcolor}{rgb}{1, 0.55, 0}
+\definecolor{algcolor}{rgb}{0.9, 0.9, 0.99}
+}
+% conditional checks
+\newcommand{\emptyarg}[1][]{\ifthenelse{\isempty{#1}}{}{\ (#1)}}
+% custom commands with optional argument
+\newcommand{\Def}[1][]{%\colorbox{defcolor}{%
+\color{custtitlecolor}{\textbf{D.\emptyarg[#1]}}
+%}
+\kern+0.3ex}
+\newcommand{\Thm}[1][]{%\colorbox{thmcolor}{%
+\color{custtitlecolor}{\textbf{T.\emptyarg[#1]}}
+%}
+\kern+0.3ex}
+\newcommand{\Lem}[1][]{\colorbox{thmcolor}{%
+\color{custtitlecolor}{\textbf{L.\emptyarg[#1]}}}\kern+0.3ex}
+\newcommand{\Cor}[1][]{\colorbox{thmcolor}{%
+\color{custtitlecolor}{\textbf{C.\emptyarg[#1]}}}\kern+0.3ex}
+\newcommand{\Ex}[1][]{\colorbox{excolor}{%
+\color{custtitlecolor}{\textbf{Ex.\emptyarg[#1]}}}\kern+0.3ex}
+\newcommand{\Alg}[1][]{\colorbox{algcolor}{%
+\color{custtitlecolor}{\textbf{Alg. #1}}}\kern+0.3ex}
+% custom commands with no argument
+\newcommand{\Com}{\textbf{Com.} }
+\newcommand{\Note}{\textbf{Note.} }
+\newcommand{\Important}{\textbf{Important.} }
+\newcommand{\Attention}{\textbf{Attention.} }
+\newcommand{\Proof}{\textbf{Proof.} }
+\newcommand{\Intuition}{\textbf{Intuition.} }
+\newcommand{\Trick}[1][]{\textbf{Trick.\emptyarg[#1]}\kern+0.3ex}
+
+
+% CUSTOM TITLES
+\usepackage[explicit]{titlesec}
+\iftoggle{greytext}{
+% grey out sections
+\definecolor{sectioncolor}{rgb}{0.95,0.95,0.95}
+\definecolor{sectionbarcolor}{rgb}{0.98,0.98,0.98}
+\newcommand*{\mybox}[1]{%
+    \noindent\colorbox{sectionbarcolor}{%
+        \parbox{\dimexpr\columnwidth-2\fboxsep\relax}{%
+            \textcolor{white}{#1}}}}
+}{
+% use blue color
+\definecolor{sectioncolor}{rgb}{0,0,205}
+\newcommand*{\mybox}[1]{%
+    \noindent\colorbox{sectioncolor}{%
+        \parbox{\dimexpr\columnwidth-2\fboxsep\relax}{%
+            \textcolor{white}{#1}}}}
+}
+% Raised Rule Command:
+% - arg 1 (optional) how high to raise the rule
+% - arg 2 thickness of the rule
+\newcommand{\raisedrulefill}[2][0ex]{\leaders\hbox{\rule[#1]{1pt}{#2}}\hfill}
+
+% multi-line titles
+\def\maxwidth{.78\linewidth}
+\newsavebox\tempbox
+\def\testwidth#1{%
+\sbox{\tempbox}{#1}%
+  \ifdim\wd\tempbox<\maxwidth
+    \usebox{\tempbox}%
+  \else
+    \parbox{\maxwidth}{#1}%
+  \fi}
+
+% part title format
+\renewcommand\thepart{{\HUGE $\mathcal{\Alph{part}}$.}}
+\titleformat{\part}{\Huge\bfseries}{\color{sectioncolor}\thepart\, #1}{0em}{}
+% section title format
+\makeatletter
+\renewcommand\section{
+\@startsection {section}{1}{\z@}{0pt}{0pt}{\normalfont\bfseries\mybox}}
+\makeatother
+% subsection title format
+\titleformat{\subsection}{\bfseries}
+    {\color{sectioncolor}\rule[0.3ex]{0pt}{0pt}
+    \thesubsection\,\rule[0.3ex]{8pt}{1.5pt}\,}{0em}
+    {\color{sectioncolor}\testwidth{#1}\,\raisedrulefill[0.3ex]{1.5pt}}
+% subsubsection title format
+\titleformat{\subsubsection}{\bfseries}
+    {\color{sectioncolor}\rule[0.35ex]{0pt}{0pt}
+    \thesubsubsection\,\rule[0.35ex]{8pt}{0.5pt}\,}{0em}
+    {\color{sectioncolor}\testwidth{#1}\,\raisedrulefill[0.35ex]{0.5pt}}
+% title spacings
+\iftoggle{shortdocument}{
+\titlespacing*{\part}
+{0pt}{0ex plus 0ex minus 0ex}{0ex plus 0ex}
+\titlespacing*{\section}
+{0pt}{0ex plus 0ex minus 0ex}{0ex plus 0ex}
+\titlespacing*{\subsection}
+{0pt}{0ex plus 0ex minus 0ex}{0ex plus 0ex}
+\titlespacing*{\subsubsection}
+{0pt}{0ex plus 0ex minus 0ex}{0ex plus 0ex}
+}{
+\titlespacing*{\part}
+{0pt}{1.2ex plus 1ex minus .2ex}{0ex plus .2ex}
+\titlespacing*{\section}
+{0pt}{0.8ex plus 1ex minus .2ex}{0ex plus .2ex}
+\titlespacing*{\subsection}
+{0pt}{0.7ex plus 1ex minus .2ex}{0ex plus .2ex}
+\titlespacing*{\subsubsection}
+{0pt}{0.5ex plus 1ex minus .2ex}{0ex plus .2ex}
+}
+
+% TABLE OF CONTENT
+% remove table of contents title
+\makeatletter
+\renewcommand\tableofcontents{%
+    \@starttoc{toc}%
+}
+\makeatother
+
+% SEPARATORS
+\usepackage{dashrule}
+\newcommand{\sep}{\vspace{0pt}\noindent\hrule\vspace{0pt}}
+\newcommand{\ssep}{\hdashrule[1.1ex]{\linewidth}{0.1pt}{0.3mm}}
+
+% INTER-TITLES
+\newcommand{\intertitle}[1]{\rule[0.35ex]{5pt}{0.5pt}
+\textbf{#1} 
+\raisedrulefill[0.35ex]{0.5pt}
+}
+
+% DOCUMENT
+\title{Advanced Machine Learning}
+\author{Summary - HS 2021}
+\date{Pius Kriemler}
+
+\begin{document}
+\begin{landscape}
+\pagenumbering{gobble}
+
+% GREY TEXT FOR SUMMARIES
+\iftoggle{greytext}{%
+  % grey out text
+  \definecolor{lighttext}{rgb}{0.95,0.95,0.95}
+  \color{lighttext}
+}{
+  % show text with normal color
+}
+
+% SHOW COMMENTS IF OPTED IN 
+\iftoggle{showcomments}{
+\renewenvironment{comment}{\color{blue}}{}% blue and in text
+}
+
+% EQUATION SPACING
+\iftoggle{shortdocument}{
+\setlength{\abovedisplayskip}{0pt}%
+\setlength{\belowdisplayskip}{0pt}%
+\setlength{\abovedisplayshortskip}{0pt}%
+\setlength{\belowdisplayshortskip}{0pt}%
+\setlength{\jot}{0pt}% Inter-equation spacing
+}{
+\setlength{\abovedisplayskip}{3pt}%
+\setlength{\belowdisplayskip}{3pt}%
+\setlength{\abovedisplayshortskip}{3pt}%
+\setlength{\belowdisplayshortskip}{3pt}%
+\setlength{\jot}{3pt}% Inter-equation spacing
+}
+
+\begin{multicols*}{3}
+\raggedcolumns
+
+\input{Backpropagation}
+\input{LLModeling}
+\input{SentimentMLP}
+\input{LanguageModel}
+\input{CRFs}
+\input{CFP}
+\input{DependencyParsing}
+\input{SemanticParsing}
+\input{WeightedFiniteStateTransducers}
+\input{MachineTranslationWithTransformers}
+\input{AxesOfModeling}
+\input{BiasFairness}
+
+
+
+
+\end{multicols*}
+\end{landscape}
+\end{document}
